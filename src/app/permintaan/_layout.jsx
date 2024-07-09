@@ -23,7 +23,14 @@ export default function PermintaanLayout() {
         name="tambah"
         options={{
           headerTitle: "Tambah Permintaan",
-          presentation: "modal",
+          headerLeft: () => (
+            <MaterialIcons
+              name="arrow-back"
+              size={24}
+              color="black"
+              onPress={() => router.back()}
+            />
+          ),
         }}
       />
     </Stack>

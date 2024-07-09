@@ -78,6 +78,7 @@ const Permintaan = () => {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => <ListPermintaan item={item} />}
           contentContainerStyle={styles.list}
+          ItemSeparatorComponent={() => <View style={{ height: 15 }} />}
         />
         <Link href="/permintaan/tambah" asChild>
           <FAB style={styles.fab} color="white" icon="plus" />
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
+    maxWidth: "100%",
   },
   isLoading: {
     flex: 1,
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: 20,
-    width: "100%",
+    marginBottom: 20,
   },
   fab: {
     position: "absolute",

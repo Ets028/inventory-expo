@@ -1,6 +1,14 @@
-//fetch barang
 
 import { axiosInstance } from "./api";
+
+type Tbarang = {
+    kode_barang: string,
+    nama_barang: string,
+    kategori: string,
+    stok: number,
+    satuan: string,
+    image_url: string
+}
 
 export const getBarang = async () => {
     try {
@@ -10,7 +18,7 @@ export const getBarang = async () => {
         throw error.response.data;
     }    
 }
-export const getBarangById = async (id) => {
+export const getBarangById = async (id: Number) => {
     try {
         const response = await axiosInstance.get(`/barang/${id}`);
         return response.data;
@@ -18,7 +26,7 @@ export const getBarangById = async (id) => {
         throw error.response.data;
     }    
 }
-export const deleteBarang = async (id) => {
+export const deleteBarang = async (id: Number) => {
     try {
         const response = await axiosInstance.delete(`/barang/${id}`);
         return response.data;
@@ -27,15 +35,7 @@ export const deleteBarang = async (id) => {
     }    
 }
 
-export const addBarang = async ({kode_barang, nama_barang, kategori, stok, satuan, image_url}) => {
-    const data = {
-        kode_barang,
-        nama_barang,
-        kategori,
-        stok,
-        satuan,
-        image_url
-    }
+export const addBarang = async (data: Tbarang) => {
     try {
         const response = await axiosInstance.post('/barang', data);
         return response.data;
@@ -44,15 +44,7 @@ export const addBarang = async ({kode_barang, nama_barang, kategori, stok, satua
     }    
 }
 
-export const editBarang = async (id, {kode_barang, nama_barang, kategori, stok, satuan, image_url}) => {
-    const data = {
-        kode_barang,
-        nama_barang,
-        kategori,
-        stok,
-        satuan,
-        image_url
-    }
+export const editBarang = async (id: Number, data: Tbarang) => {
     try {
         const response = await axiosInstance.patch(`/barang/${id}`, data);
         return response.data;

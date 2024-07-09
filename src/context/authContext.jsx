@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
     token: null,
     userInfo: null,
   });
-  const [role, setRole] = useState(null); // Pisahkan role dari authState
   const router = useRouter();
 
   const loginUser = async (email, password) => {
@@ -18,11 +17,10 @@ export const AuthProvider = ({ children }) => {
       const response = await apiLoginUser(email, password);
       const { token } = response.data;
       const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode token payload
-      const { userId, role, nama_lengkap: namaLengkap, alamat, telepon } = decodedToken;
+      const { userId, username, role } = decodedToken;
       console.log(decodedToken)
-      const userInfo = { userId, namaLengkap, alamat, telepon };
+      const userInfo = { userId, username, role };
       setAuthState({ token, userInfo });
-      setRole(role);
       await saveToken(token);
       router.replace('/(drawer)/(tabs)/home');
     } catch (error) {
@@ -32,13 +30,12 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logoutUser = async () => {
-    setAuthState({ token: null, userInfo: null });
-    setRole(null); // Clear role
+    setAuthState({ token: null, userInfo: null }); // Clear role
     await removeToken();
   };
 
   return (
-    <AuthContext.Provider value={{ ...authState, role, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ ...authState, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );

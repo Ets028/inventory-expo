@@ -46,6 +46,8 @@ const ViewBarang = () => {
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.list}
             numColumns={2}
+            showsVerticalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ height:5 }} />}
           />
         )}
         <FAB
@@ -62,7 +64,7 @@ const ViewBarang = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 2,
+    padding: 1,
     backgroundColor: Theme.colors.surface,
   },
   loadingContainer: {

@@ -73,13 +73,13 @@ export default function PermintaanById() {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "pending":
+      case "Pending":
         return styles.pending;
-      case "approved":
+      case "Approved":
         return styles.approved;
-      case "sudah dipenuhi":
+      case "Sudah Dipenuhi":
         return styles.sudahDipenuhi;
-      case "belum dipenuhi":
+      case "Belum Dipenuhi":
         return styles.belumDipenuhi;
       default:
         return styles.defaultStatus;
@@ -117,7 +117,7 @@ export default function PermintaanById() {
               No Permintaan: {permintaan?.no_permintaan}
             </Text>
             <Text style={styles.text}>
-              Customer: {permintaan?.nama_customer}
+              Customer: {permintaan?.customer?.nama_customer}
             </Text>
             <Text style={styles.text}>
               Nama Barang: {permintaan?.barang?.nama_barang}
@@ -147,7 +147,7 @@ export default function PermintaanById() {
             <TouchableOpacity
               style={styles.buttonEdit}
               onPress={() =>
-                router.push(`/permintaan/(edit)/${permintaan?.data.id}`)
+                router.push(`/permintaan/(edit)/${permintaan?.id}`)
               }
             >
               <MaterialIcons name="mode-edit" size={24} color="white" />

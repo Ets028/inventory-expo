@@ -23,6 +23,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     flex: 1,
+    padding: 10,
+    marginVertical: 10,
   },
   item: {
     backgroundColor: "#fff",
@@ -51,6 +53,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: "#333",
+    marginTop: 10,
   },
   namaBarang: {
     fontSize: 14,

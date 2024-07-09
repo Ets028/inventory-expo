@@ -9,7 +9,7 @@ axiosInstance.interceptors.request.use(async (config) => {
   return config;
 });
 
-export const loginUser = async (email, password) => {
+export const loginUser = async (email: String, password: String) => {
   try {
     const response = await axiosInstance.post('/login', {email, password});
     return response.data;

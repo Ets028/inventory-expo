@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { AuthProvider } from '@/context/authContext';
-
+import 'react-native-reanimated'
 
 const queryClient = new QueryClient();
 

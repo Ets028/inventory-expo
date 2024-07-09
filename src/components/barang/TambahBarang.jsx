@@ -74,7 +74,7 @@ const TambahBarang = () => {
           throw new Error(error.message);
         }
 
-        console.log("Uploaded data:", uploadedData);
+        // console.log("Uploaded data:", uploadedData);
 
         // Mendapatkan URL publik dari path
         const { data } = await supabase.storage
@@ -83,7 +83,7 @@ const TambahBarang = () => {
 
         imageUrl = data.publicUrl;
 
-        console.log("Public URL:", imageUrl);
+        // console.log("Public URL:", imageUrl);
       }
 
       const response = await axiosInstance.post("/barang", {

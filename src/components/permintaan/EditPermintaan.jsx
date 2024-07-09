@@ -11,10 +11,11 @@ import { Picker } from "@react-native-picker/picker";
 import { getBarang } from "@/hooks/useBarang";
 import { Theme } from "@/constants/Theme";
 import Button from "../Button";
+import { getCustomer } from "@/hooks/useCustomer";
 
 const schema = Yup.object().shape({
   no_permintaan: Yup.string().required("No. Permintaan is required"),
-  nama_customer: Yup.string().required("Nama Customer is required"),
+  customerId: Yup.string().required("Nama Customer is required"),
   barangId: Yup.number().required("Barang is required"),
   jumlah: Yup.number()
     .required("Jumlah is required")
@@ -38,6 +39,11 @@ export default function EditPermintaan() {
     queryFn: getBarang,
   });
 
+  const {data: customer } = useQuery({
+    queryKey: ["customer"],
+    queryFn: getCustomer,
+  })
+
   const mutation = useMutation({
     mutationFn: (values) => updatePermintaan(params.id, values),
   });
@@ -58,11 +64,13 @@ export default function EditPermintaan() {
       ...values,
       barangId: Number(values.barangId),
       jumlah: Number(values.jumlah),
+      customerId: Number(values.customerId),
     };
 
     try {
       await mutation.mutateAsync(updatedValues);
-      Alert.alert("Success", "Permintaan Berhasil Diupdate");
+      Alert.alert("Success", "Permintaan updated successfully");
+      console.log(values)
       router.push("/permintaan");
       setIsLoading(false);
     } catch (error) {
@@ -73,22 +81,16 @@ export default function EditPermintaan() {
     }
   };
 
-  useEffect(() => {
-    if (mutation.isSuccess) {
-      Alert.alert("Success", "Permintaan Berhasil Diupdate");
-    }
-  }, [mutation.isSuccess]);
-
   return (
     <Layout>
       <Formik
         initialValues={{
-          no_permintaan: permintaan?.data.no_permintaan || "",
-          nama_customer: permintaan?.data.nama_customer || "",
-          barangId: permintaan?.data.barang?.id || null,
-          jumlah: permintaan?.data.jumlah || "",
-          deskripsi: permintaan?.data.deskripsi || "",
-          status: permintaan?.data.status || "",
+          no_permintaan: permintaan?.no_permintaan || "",
+          customerId: permintaan?.customer?.id || null,
+          barangId: permintaan?.barang?.id || null,
+          jumlah: permintaan?.jumlah || "",
+          deskripsi: permintaan?.deskripsi || "",
+          status: permintaan?.status || "",
         }}
         validationSchema={schema}
         onSubmit={handleSubmit}
@@ -112,16 +114,22 @@ export default function EditPermintaan() {
               activeOutlineColor={Theme.colors.primary}
               style={styles.input}
             />
-            <TextInput
-              label="Customer"
-              value={values.nama_customer}
-              onChangeText={handleChange("nama_customer")}
-              onBlur={handleBlur("nama_customer")}
-              mode="outlined"
-              outlineColor={Theme.colors.primary}
-              activeOutlineColor={Theme.colors.primary}
-              style={styles.input}
-            />
+            <Picker
+            selectedValue={values.customerId}
+            style={styles.picker}
+            onValueChange={(itemValue) => {
+              setFieldValue("customerId", itemValue);
+            }}
+            >
+              <Picker.Item label="Pilih Customer" value={null} />
+              {customer?.data.map((customer) => (
+                <Picker.Item
+                  key={customer.id}
+                  label={customer.nama_customer}
+                  value={customer.id}
+                />
+              ))}
+            </Picker>
             <Picker
               selectedValue={values.barangId}
               style={styles.picker}

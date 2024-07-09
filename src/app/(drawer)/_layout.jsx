@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Drawer } from "expo-router/drawer";
-import { FontAwesome, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome, MaterialIcons, FontAwesome5, Ionicons } from "@expo/vector-icons";
 
 export default function DrawerLayout() {
   return (
@@ -22,6 +22,22 @@ export default function DrawerLayout() {
               <FontAwesome name="home" size={24} color={color} />
             ),
             initialRouteName: "home",
+          }}
+        />
+        <Drawer.Screen
+          name="customer"
+          options={{
+            title: "Customer",
+            drawerLabelStyle: { marginLeft: -25, fontWeight: "bold", fontSize: 16 },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              marginLeft: -20,
+              justifyContent: "center",
+              textAlign: "center",
+            },
+            drawerIcon: ({ color }) => (
+              <Ionicons name="people-circle-outline" size={24} color={color} />
+            ),
           }}
         />
         <Drawer.Screen

@@ -2,19 +2,21 @@ import React from "react";
 import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
+import { Card } from "react-native-paper";
+import { Theme } from "@/constants/Theme";
 
 export default function ListPermintaan({ item }) {
   const router = useRouter();
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "pending":
+      case "Pending":
         return styles.pending;
-      case "approved":
+      case "Approved":
         return styles.approved;
-      case "sudah dipenuhi":
+      case "Sudah Dipenuhi":
         return styles.sudahDipenuhi;
-      case "belum dipenuhi":
+      case "Belum Dipenuhi":
         return styles.belumDipenuhi;
       default:
         return styles.defaultStatus;
@@ -22,43 +24,47 @@ export default function ListPermintaan({ item }) {
   };
 
   return (
-    <View style={styles.card}>
-      <Link href={{ pathname: "/permintaan/[id]", params: { id: item.id }}} asChild>
-      <TouchableOpacity
-        style={styles.content}
-      >
-        <View style={styles.header}>
-          <Text style={styles.item}>No Permintaan: {item.no_permintaan}</Text>
-          <Ionicons
-            name="document-text-outline"
-            size={24}
-            color="black"
-            style={styles.icon}
-          />
-        </View>
-        <Text style={styles.item}>Nama Barang   : {item.barang?.nama_barang}</Text>
-        <Text style={styles.item}>Nama Customer : {item.nama_customer}</Text>
-        <Text style={styles.item}>Deskripsi: {item.deskripsi}</Text>
-        <Text style={[styles.item, getStatusStyle(item.status)]}>
-          {item.status}
-        </Text>
-      </TouchableOpacity>
-    </Link>
-    </View>
+    <Card style={styles.card}>
+      <Link href={{ pathname: "/permintaan/[id]", params: { id: item.id } }} asChild>
+        <TouchableOpacity
+        >
+          <Card.Content>
+            <View style={styles.header}>
+              <Text style={styles.item}>No Permintaan: {item.no_permintaan}</Text>
+              <Ionicons
+                name="document-text-outline"
+                size={24}
+                color="black"
+                style={styles.icon}
+              />
+            </View>
+            <Text style={styles.item}>Nama Barang: {item.barang?.nama_barang}</Text>
+            <Text style={styles.item}>Nama Customer: {item.customer?.nama_customer}</Text>
+            <Text style={styles.item}>Deskripsi: {item.deskripsi}</Text>
+            <Text style={[styles.item, getStatusStyle(item.status)]}>
+              {item.status}
+            </Text>
+          </Card.Content>
+        </TouchableOpacity>
+      </Link>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    marginBottom: 10,
+    padding: 5,
     borderRadius: 5,
-    padding: 10,
-  },
-  content: {
-    flexDirection: "column",
+    backgroundColor: Theme.colors.surface,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   header: {
     flexDirection: "row",

@@ -1,5 +1,13 @@
 import { axiosInstance } from "./api";
 
+type Tpermintaan = {
+    no_permintaan: String
+    customerId: Number
+    barangId: String
+    jumlah: Number
+    deskripsi: String
+}   
+
 export const getPermintaan = async () => {
     try {
         const response = await axiosInstance.get("/permintaan");
@@ -9,7 +17,7 @@ export const getPermintaan = async () => {
     }
 }
 
-export const getPermintaanById = async (id) => {
+export const getPermintaanById = async (id: Number) => {
     try {
         const response = await axiosInstance.get(`/permintaan/${id}`);
         return response.data;
@@ -18,7 +26,7 @@ export const getPermintaanById = async (id) => {
     }
 }
 
-export const deletePermintaan = async (id) => {
+export const deletePermintaan = async (id: Number) => {
     try {
         const response = await axiosInstance.delete(`/permintaan/${id}`);
         return response.data;
@@ -27,7 +35,7 @@ export const deletePermintaan = async (id) => {
     }
 }
 
-export const approvePermintaanById = async (id, status) => {
+export const approvePermintaanById = async (id: Number, status: String) => {
     try {
         const response = await axiosInstance.patch(`/permintaan/approved/${id}`, { status });
         return response.data;
@@ -36,14 +44,7 @@ export const approvePermintaanById = async (id, status) => {
     }
 }
 
-export const createPermintaan = async (data) => {
-    data = {
-        no_permintaan: data.no_permintaan,
-        nama_customer: data.nama_customer,
-        barangId: data.barangId,
-        jumlah: data.jumlah,
-        deskripsi: data.deskripsi,
-    }
+export const createPermintaan = async (data: Tpermintaan) => {
     try {
         const response = await axiosInstance.post("/permintaan", data);
         console.log(response.data)
@@ -53,17 +54,10 @@ export const createPermintaan = async (data) => {
     }
 }
 
-export const updatePermintaan = async (id, data) => {
-    data = {
-        no_permintaan: data.no_permintaan,
-        nama_customer: data.nama_customer,
-        barangId: data.barangId,
-        jumlah: data.jumlah,
-        deskripsi: data.deskripsi,
-        status: data.status
-    }
+export const updatePermintaan = async (id: Number, data: Tpermintaan) => {
     try {
         const response = await axiosInstance.patch(`/permintaan/${id}`, data);
+        console.log(response.data)
         return response.data;
     } catch (error) {
         console.error(error);
