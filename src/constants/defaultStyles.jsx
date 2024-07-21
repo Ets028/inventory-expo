@@ -6,7 +6,7 @@ export const defaultStyles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Theme.colors.background,
-        padding: 24
+        padding: 10,
     },
     Pillbutton: {
         backgroundColor: Theme.colors.primary,

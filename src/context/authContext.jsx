@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext } from 'react';
 import { loginUser as apiLoginUser } from '@/hooks/useLogin';
 import { saveToken, removeToken } from '@/service/tokenManager';
 import { useRouter } from 'expo-router';
+import { Buffer } from 'buffer';
 
 const AuthContext = createContext();
 
@@ -16,13 +17,16 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await apiLoginUser(email, password);
       const { token } = response.data;
-      const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode token payload
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const decodedData = Buffer.from(base64, 'base64').toString('utf-8');
+      const decodedToken = JSON.parse(decodedData);
       const { userId, username, role } = decodedToken;
-      console.log(decodedToken)
+      console.log(decodedToken);
       const userInfo = { userId, username, role };
       setAuthState({ token, userInfo });
       await saveToken(token);
-      router.replace('/(drawer)/(tabs)/home');
+      router.replace('/home');
     } catch (error) {
       console.error('Login gagal:', error);
       throw error;

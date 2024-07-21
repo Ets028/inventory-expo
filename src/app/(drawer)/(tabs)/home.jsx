@@ -1,7 +1,7 @@
 import { Theme } from '@/constants/Theme';
 import { useAuth } from '@/context/authContext';
 import { getTransaksiKeluar } from '@/hooks/useTransaksiKeluar';
-import { getPermintaan } from '@/hooks/usePermintaan';
+import { getPermintaan, getPermintaanById } from '@/hooks/usePermintaan';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, Image, TouchableOpacity } from 'react-native';
@@ -12,19 +12,14 @@ const HomeScreen = () => {
   const { userInfo } = useAuth();
 
   const { data: history } = useQuery({
-    queryKey: ['transaksikeluar'],
+    queryKey: ['history'],
     queryFn: getTransaksiKeluar,
   });
 
-  const { data: permintaan } = useQuery({
-    queryKey: ['permintaan'],
-    queryFn: getPermintaan,
-  });
-
-  const totalPermintaan = permintaan?.data?.length || 0;
-  const sudahDipenuhi = permintaan?.data?.filter(item => item.status === 'Sudah Dipenuhi').length || 0;
-  const belumDipenuhi = permintaan?.data?.filter(item => item.status === 'Belum Dipenuhi').length || 0;
-  const jumlahBarangKeluar = permintaan?.data?.reduce((total, item) => total + item.jumlah, 0) || 0;
+  const totalPermintaan = history?.permintaan?.data?.length || 0;
+  const sudahDipenuhi = history?.permintaan?.data?.filter(item => item.status === 'Sudah Dipenuhi').length || 0;
+  const belumDipenuhi = history?.permintaan?.data?.filter(item => item.status === 'Belum Dipenuhi').length || 0;
+  const jumlahBarangKeluar = history?.permintaan?.data?.reduce((total, item) => total + item.jumlah, 0) || 0;
 
   return (
     <View style={styles.container}>
@@ -115,7 +110,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: Theme.colors.error,
+    backgroundColor: Theme.colors.secondary,
     borderRadius: 4,
   },
   logoutButtonText: {

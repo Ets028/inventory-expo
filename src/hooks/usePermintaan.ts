@@ -13,7 +13,8 @@ export const getPermintaan = async () => {
         const response = await axiosInstance.get("/permintaan");
         return response.data;
     } catch (error) {
-        console.error(error);
+        console.log("response backend:", error.response.data.message);
+        throw new Error(error.response.data.message);
     }
 }
 
@@ -40,7 +41,7 @@ export const approvePermintaanById = async (id: Number, status: String) => {
         const response = await axiosInstance.patch(`/permintaan/approved/${id}`, { status });
         return response.data;
     } catch (error) {
-        console.error(error);
+        throw new Error(error.response.data.message);
     }
 }
 
@@ -50,7 +51,7 @@ export const createPermintaan = async (data: Tpermintaan) => {
         console.log(response.data)
         return response.data;
     } catch (error) {
-        console.error(error);
+        throw new Error(error.response.data.message);
     }
 }
 

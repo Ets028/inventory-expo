@@ -8,6 +8,7 @@ import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import { Theme } from "@/constants/Theme";
 import DeleteDialog from "../DialogHapus";
 import { useState } from "react";
+import { axiosInstance } from "@/hooks/api";
 
 export default function DetailBarang() {
   const router = useRouter();
@@ -44,12 +45,13 @@ export default function DetailBarang() {
   
   const HandleDelete = async () => {
     try{
-      await deleteBarang(item?.data.id);
+      const response = await axiosInstance.delete(`/barang/${item?.data.id}`);
       Alert.alert("Success", "Barang Berhasil Dihapus");
+      console.log(response);
       router.push("/inventory")
     }
     catch(error){
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", error.response.data.message);
     }
   }
 

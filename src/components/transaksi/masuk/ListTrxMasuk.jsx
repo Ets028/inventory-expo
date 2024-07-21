@@ -25,10 +25,11 @@ const styles = StyleSheet.create({
       card : {
         flex: 1,
         borderRadius: 5,
-        padding: 10,
+        padding: 15,
         margin: 5,
         elevation: 5,
         backgroundColor: Theme.colors.surface,
+        width: '100%',
       },
       text: {
         fontSize: 18,

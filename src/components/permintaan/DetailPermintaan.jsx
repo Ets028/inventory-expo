@@ -25,8 +25,8 @@ export default function PermintaanById() {
   const router = useRouter();
   const [DialogVisible, setDialogVisible] = useState(false);
 
-  const { data: permintaan, isLoading, error } = useQuery({
-    queryKey: ["permintaan", params.id],
+  const { data: permintaanId, isLoading, error } = useQuery({
+    queryKey: ["permintaanId", params.id],
     queryFn: () => getPermintaanById(params.id),
     onError: (error) => {
       Alert.alert("Error", error.message);
@@ -43,15 +43,6 @@ export default function PermintaanById() {
     },
   });
 
-  const handleApprove = async () => {
-    try {
-      const approve = await approveMutation.mutateAsync(params.id);
-      return approve;
-    } catch (error) {
-      Alert.alert("Error", error.message);
-    }
-  };
-
   const deleteMutation = useMutation({
     mutationFn: deletePermintaan,
     onSuccess: () => {
@@ -65,7 +56,7 @@ export default function PermintaanById() {
 
   const handleDelete = async () => {
     try {
-      await deleteMutation.mutateAsync(permintaan?.data.id);
+      await deleteMutation.mutateAsync(permintaanId?.data.id);
     } catch (error) {
       Alert.alert("Error", error.message);
     }
@@ -96,7 +87,7 @@ export default function PermintaanById() {
     );
   }
 
-  if (error || !permintaan) {
+  if (error || !permintaanId) {
     return (
       <Layout>
         <View style={styles.container}>
@@ -114,26 +105,26 @@ export default function PermintaanById() {
         <Card style={styles.card}>
           <View style={styles.cardContent}>
             <Text style={styles.text}>
-              No Permintaan: {permintaan?.no_permintaan}
+              No Permintaan: {permintaanId?.no_permintaan}
             </Text>
             <Text style={styles.text}>
-              Customer: {permintaan?.customer?.nama_customer}
+              Customer: {permintaanId?.customer?.nama_customer}
             </Text>
             <Text style={styles.text}>
-              Nama Barang: {permintaan?.barang?.nama_barang}
+              Nama Barang: {permintaanId?.barang?.nama_barang}
             </Text>
-            <Text style={styles.text}>Jumlah: {permintaan?.jumlah}</Text>
+            <Text style={styles.text}>Jumlah: {permintaanId?.jumlah}</Text>
             <Text style={styles.text}>
-              Deskripsi: {permintaan?.deskripsi}
+              Deskripsi: {permintaanId?.deskripsi}
             </Text>
-            <TouchableOpacity onLongPress={handleApprove}>
+            <TouchableOpacity onLongPress={() => approveMutation.mutate(permintaanId?.id)}>
               <Text
                 style={[
                   styles.status,
-                  getStatusStyle(permintaan?.status),
+                  getStatusStyle(permintaanId?.status),
                 ]}
               >
-                Status: {permintaan?.status}
+                Status: {permintaanId?.status}
               </Text>
             </TouchableOpacity>
           </View>
@@ -147,7 +138,7 @@ export default function PermintaanById() {
             <TouchableOpacity
               style={styles.buttonEdit}
               onPress={() =>
-                router.push(`/permintaan/(edit)/${permintaan?.id}`)
+                router.push(`/permintaan/(edit)/${permintaanId?.id}`)
               }
             >
               <MaterialIcons name="mode-edit" size={24} color="white" />

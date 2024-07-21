@@ -31,7 +31,7 @@ export const deleteBarang = async (id: Number) => {
         const response = await axiosInstance.delete(`/barang/${id}`);
         return response.data;
     } catch (error) {
-        throw error.response.data;
+        throw error.response.data.message;
     }    
 }
 
@@ -40,7 +40,9 @@ export const addBarang = async (data: Tbarang) => {
         const response = await axiosInstance.post('/barang', data);
         return response.data;
     } catch (error) {
-        throw error.response.data;
+        if(error.response){
+            throw error.response.data.message
+        }
     }    
 }
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -7,9 +7,11 @@ import { TextInput } from 'react-native-paper';
 import Button from '@/components/Button';
 import { Picker } from '@react-native-picker/picker';
 import { getPermintaan } from '@/hooks/usePermintaan';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Theme } from '@/constants/Theme';
 import { createTrx } from '@/hooks/useTransaksiKeluar';
+import { useRouter } from 'expo-router';
+import { useAuth } from '@/context/authContext';
 
 const validationSchema = Yup.object().shape({
   no_transaksi_keluar: Yup.string().required('No Transaksi Keluar harus diisi'),
@@ -17,20 +19,37 @@ const validationSchema = Yup.object().shape({
   nama_pengirim: Yup.string().required('Nama Pengirim harus diisi'),
   tanggal_keluar: Yup.string().required('Tgl Keluar harus diisi'),
   jam_keluar: Yup.string().required('Jam Keluar harus diisi'),
-  jumlah: Yup.string().required('Jumlah harus diisi'),
+  jumlah: Yup.number().required('Jumlah harus diisi').positive().integer(),
   barangId: Yup.string().required('Barang harus diisi'),
   customerId: Yup.string().required('Customer harus diisi'),
 });
 
 const TambahTrxScreen = () => {
+  const router = useRouter();
+  const { userInfo: { role } } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const { data: permintaan, isLoading: isPermintaanLoading } = useQuery({
     queryKey: ["permintaan"],
     queryFn: getPermintaan,
   });
 
-  const mutation = useMutation({
-    mutationFn: (values) => createTrx(values),
-  });
+  const handleSubmit = async (values) => {
+    //jika role nya bukan admin atau supervisor, maka error
+    if (role !== "admin" && role !== "supervisor") {
+      Alert.alert("Error", "Anda tidak memiliki akses untuk menambahkan transaksi keluar");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      await createTrx(values);
+      router.push("/transaksi/keluar");
+    } catch (error) {
+      console.log('error:', error)
+    } finally {
+      Alert.alert("Success", "Transaksi keluar berhasil ditambahkan");
+      setIsLoading(false);
+    }
+  };
 
   const [selectedPermintaan, setSelectedPermintaan] = useState(null);
 
@@ -48,24 +67,16 @@ const TambahTrxScreen = () => {
             nama_pengirim: '',
             tanggal_keluar: formattedDate,
             jam_keluar: formattedTime,
-            jumlah: parseInt(1),
-            barangId: '', // Untuk menampilkan nama_barang di input
+            jumlah: 1,
+            barangId: '',
             customerId: '',
           }}
           validationSchema={validationSchema}
           onSubmit={(values) => {
-            // Di sini Anda dapat mengirim values dengan id barang yang sesuai
             const barangIdToSend = permintaan.find(p => p.id === values.permintaanId)?.barang.id;
-            const csId = permintaan.find(p => p.id === values.permintaanId)?.customerId
+            const csId = permintaan.find(p => p.id === values.permintaanId)?.customerId;
             const valuesToSend = { ...values, barangId: barangIdToSend, customerId: csId };
-            console.log(valuesToSend);
-            mutation.mutateAsync(valuesToSend)
-              .then(() => {
-                Alert.alert('Sukses', 'Transaksi keluar ditambahkan');
-              })
-              .catch((error) => {
-                console.error('Error saat menyimpan transaksi:', error);
-              });
+            handleSubmit(valuesToSend);
           }}
         >
           {({
@@ -78,109 +89,120 @@ const TambahTrxScreen = () => {
             setFieldValue,
           }) => (
             <View style={styles.form}>
-              <Picker
-                selectedValue={values.permintaanId}
-                style={styles.picker}
-                onValueChange={(itemValue) => {
-                  const selected = permintaan.find(p => p.id === itemValue);
-                  setFieldValue('permintaanId', itemValue);
-                  setSelectedPermintaan(selected);
-                  setFieldValue('barangId', selected ? selected.barang?.nama_barang : '');
-                  setFieldValue('customerId', selected ? selected.customer?.nama_customer : '');
-                }}
-              >
-                <Picker.Item label="Pilih Permintaan" value={null} />
-                {permintaan?.map((p) => (
-                  <Picker.Item
-                    key={p.id}
-                    label={p.no_permintaan}
-                    value={p.id}
+              {isPermintaanLoading ? (
+                <ActivityIndicator size="large" color={Theme.colors.primary} />
+              ) : (
+                <>
+                  <Picker
+                    selectedValue={values.permintaanId}
+                    style={styles.picker}
+                    onValueChange={(itemValue) => {
+                      const selected = permintaan.find(p => p.id === itemValue);
+                      setFieldValue('permintaanId', itemValue);
+                      setSelectedPermintaan(selected);
+                      setFieldValue('barangId', selected ? selected.barang?.nama_barang : '');
+                      setFieldValue('customerId', selected ? selected.customer?.nama_customer : '');
+                    }}
+                  >
+                    <Picker.Item label="Pilih Permintaan" value={null} />
+                    {permintaan?.map((p) => (
+                      <Picker.Item
+                        key={p.id}
+                        label={p.no_permintaan}
+                        value={p.id}
+                      />
+                    ))}
+                  </Picker>
+                  {touched.permintaanId && errors.permintaanId && (
+                    <Text style={styles.error}>{errors.permintaanId}</Text>
+                  )}
+                  <TextInput
+                    label="No Transaksi Keluar"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.no_transaksi_keluar}
+                    onChangeText={handleChange('no_transaksi_keluar')}
+                    onBlur={handleBlur('no_transaksi_keluar')}
                   />
-                ))}
-              </Picker>
-              <TextInput
-                label="No Transaksi Keluar"
-                mode="outlined"
-                style={styles.input}
-                value={values.no_transaksi_keluar}
-                onChangeText={handleChange('no_transaksi_keluar')}
-                onBlur={handleBlur('no_transaksi_keluar')}
-              />
-              {touched.no_transaksi_keluar && errors.no_transaksi_keluar && (
-                <Text style={styles.error}>{errors.no_transaksi_keluar}</Text>
+                  {touched.no_transaksi_keluar && errors.no_transaksi_keluar && (
+                    <Text style={styles.error}>{errors.no_transaksi_keluar}</Text>
+                  )}
+                  <TextInput
+                    label="Tujuan"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.customerId}
+                    onChangeText={handleChange('customerId')}
+                    onBlur={handleBlur('customerId')}
+                    editable={false}
+                  />
+                  {touched.customerId && errors.customerId && (
+                    <Text style={styles.error}>{errors.customerId}</Text>
+                  )}
+                  <TextInput
+                    label="Barang"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.barangId}
+                    onChangeText={handleChange('barangId')}
+                    onBlur={handleBlur('barangId')}
+                    editable={false}
+                  />
+                  {touched.barangId && errors.barangId && (
+                    <Text style={styles.error}>{errors.barangId}</Text>
+                  )}
+                  <TextInput
+                    label="Jumlah"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.jumlah.toString()}
+                    keyboardType="numeric"
+                    onChangeText={handleChange('jumlah')}
+                    onBlur={handleBlur('jumlah')}
+                  />
+                  {touched.jumlah && errors.jumlah && (
+                    <Text style={styles.error}>{errors.jumlah}</Text>
+                  )}
+                  <TextInput
+                    label="Tgl Keluar"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.tanggal_keluar}
+                    onChangeText={handleChange('tanggal_keluar')}
+                    onBlur={handleBlur('tanggal_keluar')}
+                    editable={false}
+                  />
+                  {touched.tanggal_keluar && errors.tanggal_keluar && (
+                    <Text style={styles.error}>{errors.tanggal_keluar}</Text>
+                  )}
+                  <TextInput
+                    label="Jam Keluar"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.jam_keluar}
+                    onChangeText={handleChange('jam_keluar')}
+                    onBlur={handleBlur('jam_keluar')}
+                    editable={false}
+                  />
+                  {touched.jam_keluar && errors.jam_keluar && (
+                    <Text style={styles.error}>{errors.jam_keluar}</Text>
+                  )}
+                  <TextInput
+                    label="Pengirim"
+                    mode="outlined"
+                    style={styles.input}
+                    value={values.nama_pengirim}
+                    onChangeText={handleChange('nama_pengirim')}
+                    onBlur={handleBlur('nama_pengirim')}
+                  />
+                  {touched.nama_pengirim && errors.nama_pengirim && (
+                    <Text style={styles.error}>{errors.nama_pengirim}</Text>
+                  )}
+                  <Button mode="contained" style={styles.button} onPress={handleSubmit} disabled={isLoading}>
+                    {isLoading ? <ActivityIndicator size="small" color="white" /> : 'Submit'}
+                  </Button>
+                </>
               )}
-              <TextInput
-                label="Tujuan"
-                mode="outlined"
-                style={styles.input}
-                value={values.customerId}
-                onChangeText={handleChange('customerId')}
-                onBlur={handleBlur('customerId')}
-                editable={false} // Disable editing
-              />
-              {touched.customerId && errors.customerId && (
-                <Text style={styles.error}>{errors.customerId}</Text>
-              )}
-              <TextInput
-                label="Barang"
-                mode="outlined"
-                style={styles.input}
-                value={values.barangId} // Menampilkan nama_barang di sini
-                onChangeText={handleChange('barangId')}
-                onBlur={handleBlur('barangId')}
-                editable={false} // Disable editing
-              />
-              {touched.barangId && errors.barangId && (
-                <Text style={styles.error}>{errors.barangId}</Text>
-              )}
-              <TextInput
-                label="Jumlah"
-                mode="outlined"
-                style={styles.input}
-                value={values.jumlah}
-                keyboardType="numeric"
-                onChangeText={handleChange('jumlah')}
-                onBlur={handleBlur('jumlah')}
-              />
-              {touched.jumlah && errors.jumlah && (
-                <Text style={styles.error}>{errors.jumlah}</Text>
-              )}
-              <TextInput
-                label="Tgl Keluar"
-                mode="outlined"
-                style={styles.input}
-                value={values.tanggal_keluar}
-                onChangeText={handleChange('tanggal_keluar')}
-                onBlur={handleBlur('tanggal_keluar')}
-                editable={false}
-              />
-              {touched.tanggal_keluar && errors.tanggal_keluar && (
-                <Text style={styles.error}>{errors.tanggal_keluar}</Text>
-              )}
-              <TextInput
-                label="Jam Keluar"
-                mode="outlined"
-                style={styles.input}
-                value={values.jam_keluar}
-                onChangeText={handleChange('jam_keluar')}
-                onBlur={handleBlur('jam_keluar')}
-                editable={false}
-              />
-              {touched.jam_keluar && errors.jam_keluar && (
-                <Text style={styles.error}>{errors.jam_keluar}</Text>
-              )}
-              <TextInput
-                label="Pengirim"
-                mode="outlined"
-                style={styles.input}
-                value={values.nama_pengirim}
-                onChangeText={handleChange('nama_pengirim')}
-                onBlur={handleBlur('nama_pengirim')}
-              />
-              {touched.nama_pengirim && errors.nama_pengirim && (
-                <Text style={styles.error}>{errors.nama_pengirim}</Text>
-              )}
-              <Button mode="contained" style={styles.button} onPress={handleSubmit}>Simpan</Button>
             </View>
           )}
         </Formik>

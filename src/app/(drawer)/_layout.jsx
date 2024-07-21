@@ -57,6 +57,22 @@ export default function DrawerLayout() {
           }}
         />
         <Drawer.Screen
+          name="supplier"
+          options={{
+            title: "Supplier",
+            drawerLabelStyle: { marginLeft: -25, fontWeight: "bold", fontSize: 16 },
+            headerTitleStyle: {
+              fontWeight: "bold",
+              marginLeft: -20,
+              justifyContent: "center",
+              textAlign: "center",
+            },
+            drawerIcon: ({ color }) => (
+              <MaterialIcons name="request-quote" size={24} color={color} />
+            ),
+          }}
+        />
+        <Drawer.Screen
           name="transaksiKeluar"
           options={{
             title: "Transaksi Keluar",

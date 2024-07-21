@@ -17,6 +17,7 @@ import supabase from "@/service/supabaseClient";
 import { axiosInstance } from "@/hooks/api";
 import Layout from "../Layout";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/context/authContext";
 
 // Validasi schema menggunakan Yup
 const TambahBarangSchema = Yup.object().shape({
@@ -29,9 +30,10 @@ const TambahBarangSchema = Yup.object().shape({
 });
 
 const TambahBarang = () => {
-  const router = useRouter(); // Mengambil router untuk navigasi
-  const [image, setImage] = useState(null); // State untuk menyimpan gambar yang dipilih
-  const [loading, setLoading] = useState(false); // State untuk loading state
+  const { userInfo: { role } } = useAuth();
+  const router = useRouter();
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Fungsi untuk memilih gambar dari galeri
   const pickImage = async () => {
@@ -48,58 +50,55 @@ const TambahBarang = () => {
   };
 
   const handleSubmit = async (values) => {
-    setLoading(true);
-
-    try {
-      let imageUrl = values.image_url;
-
-      // Jika tidak menggunakan URL gambar dan gambar telah dipilih
-      if (!imageUrl && image && image.uri) {
-        const imageUri = image.uri;
-        const fileName = imageUri.split("/").pop();
-
-        // Mengambil file dari local URI dan mengonversinya menjadi ArrayBuffer
-        const response = await fetch(imageUri);
-        const arrayBuffer = await response.arrayBuffer();
-
-        // Upload image menggunakan Supabase
-        const { data: uploadedData, error } = await supabase.storage
-          .from("images")
-          .upload(fileName, arrayBuffer, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        // console.log("Uploaded data:", uploadedData);
-
-        // Mendapatkan URL publik dari path
-        const { data } = await supabase.storage
+    //jika bukan supervisor, maka error
+    if (role !== "supervisor") {
+      Alert.alert("Error", "Anda tidak memiliki akses untuk menambahkan barang");
+      router.push("/inventory");
+      return;
+    } else {
+      try {
+        let imageUrl = values.image_url;
+  
+        if (!imageUrl && image && image.uri) {
+          const imageUri = image.uri;
+          const fileName = imageUri.split("/").pop();
+  
+          const response = await fetch(imageUri);
+          const arrayBuffer = await response.arrayBuffer();
+  
+          // Upload image menggunakan Supabase
+          const { data: uploadedData, error } = await supabase.storage
+            .from("images")
+            .upload(fileName, arrayBuffer, {
+              cacheControl: "3600",
+              upsert: false,
+            });
+  
+          if (error) {
+            throw new Error(error.message);
+          }
+          const { data } = await supabase.storage
           .from("images")
           .getPublicUrl(uploadedData.path);
-
-        imageUrl = data.publicUrl;
-
-        // console.log("Public URL:", imageUrl);
+          
+          imageUrl = data.publicUrl;
+        }
+        
+        const response = await axiosInstance.post("/barang", {
+          ...values,
+          image_url: imageUrl,
+        });
+  
+        console.log(response.data);
+  
+        setLoading(false);
+        router.replace("/(drawer)/(tabs)/inventory");
+      } catch (error) {
+        setLoading(false);
+        console.log(error);
+        Alert.alert("Error", error.response.data.message);
       }
-
-      const response = await axiosInstance.post("/barang", {
-        ...values,
-        image_url: imageUrl,
-      });
-
-      console.log(response.data);
-
-      setLoading(false);
-      router.replace("/(drawer)/(tabs)/inventory");
-    } catch (error) {
-      setLoading(false);
-      console.log(error);
-      Alert.alert("Error", error.message);
-    }
+  }
   };
 
   return (

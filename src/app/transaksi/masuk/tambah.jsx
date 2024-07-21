@@ -60,7 +60,8 @@ export default function TambahTrxMasukScreen() {
             mutation.mutateAsync(values)
               .then(() => {
                 console.log('Trx masuk created successfully');
-                Alert.alert('Trx masuk created successfully');
+                Alert.alert('Success', 'Data transaksi masuk berhasil ditambahkan');
+                router.push('/transaksiMasuk');
               })
               .catch((error) => {
                 console.error('Failed to create trx masuk:', error);

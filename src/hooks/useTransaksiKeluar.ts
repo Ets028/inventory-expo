@@ -25,5 +25,6 @@ export const createTrx = async (trx: Ttrx) => {
       return response.data
     } catch (error) {
       console.log(error)
+      throw new Error(error.response.data.message)
     }
   }

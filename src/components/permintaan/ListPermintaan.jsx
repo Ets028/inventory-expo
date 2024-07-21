@@ -24,11 +24,10 @@ export default function ListPermintaan({ item }) {
   };
 
   return (
-    <Card style={styles.card}>
+    <View style={styles.card}>
       <Link href={{ pathname: "/permintaan/[id]", params: { id: item.id } }} asChild>
         <TouchableOpacity
         >
-          <Card.Content>
             <View style={styles.header}>
               <Text style={styles.item}>No Permintaan: {item.no_permintaan}</Text>
               <Ionicons
@@ -44,28 +43,26 @@ export default function ListPermintaan({ item }) {
             <Text style={[styles.item, getStatusStyle(item.status)]}>
               {item.status}
             </Text>
-          </Card.Content>
         </TouchableOpacity>
       </Link>
-    </Card>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 10,
-    padding: 5,
-    borderRadius: 5,
-    backgroundColor: Theme.colors.surface,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    margin: 8,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+},
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

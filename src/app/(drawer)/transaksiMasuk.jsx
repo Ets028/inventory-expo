@@ -1,4 +1,4 @@
-import { View, Text, FlatList, StyleSheet } from 'react-native'
+import { View, Text, FlatList, StyleSheet, } from 'react-native'
 import React from 'react'
 import Layout from '@/components/Layout';
 import { ActivityIndicator, Card, FAB } from 'react-native-paper';
@@ -8,11 +8,14 @@ import { useRouter } from 'expo-router';
 import { getTransaksiMasuk } from '@/hooks/useTransaksiMasuk';
 import ListTransaksiMasuk from '@/components/transaksi/masuk/ListTrxMasuk';
 import DownloadExcel from '@/components/DownloadExcel';
+import { useAuth } from '@/context/authContext';
+import Button from '@/components/Button';
 
 const Page = () => {
+  const { userInfo: { role } } = useAuth();
   const router = useRouter();
 
-  const { data: transaksiMasuk, isLoading, isError } = useQuery({
+  const { data: transaksiMasuk, isLoading, isError, refetch } = useQuery({
     queryKey: ['transaksiMasuk'],
     queryFn: getTransaksiMasuk,
   });
@@ -37,6 +40,16 @@ const Page = () => {
     )
   }
 
+  if (isLoading) {
+    return (
+      <Layout>
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      </Layout>
+    )
+  }
+
   if (isError) {
     return (
       <Layout>
@@ -55,17 +68,21 @@ const Page = () => {
   return (
     <Layout>
       <View>
-        {isLoading ? <ActivityIndicator size="large" color="#0000ff" /> :
           <FlatList
             data={transaksiMasuk?.data}
             renderItem={({ item }) => <ListTransaksiMasuk item={item} />}
             keyExtractor={(item) => item.id.toString()}
             contentContainerStyle={styles.list}
+            ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
+            ListEmptyComponent={() => <Text>Data transaksi masuk tidak ditemukan</Text>}
+            onRefresh={refetch}
+            refreshing={isLoading}
           />
-        }
       </View>
-        <FAB style={styles.fab} icon="plus" color={Theme.colors.surface} onPress={() => router.push("/transaksi/masuk/tambah")} />
-        <DownloadExcel data={formatedData} fileName={`Transaksi_Masuk ${formattedDate}`} />
+      {(role === "supervisor" || role === "admin") && 
+      <FAB style={styles.fab} icon="plus" color={Theme.colors.surface} 
+      onPress={() => router.push("/transaksi/masuk/tambah")} /> }
+      <DownloadExcel data={formatedData} fileName={`Transaksi_Masuk ${formattedDate}`} />
     </Layout>
   )
 }
@@ -75,7 +92,6 @@ export default Page
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },

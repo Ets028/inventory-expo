@@ -36,9 +36,10 @@ export default function SignIn() {
   return (
     <Layout>
       <Formik
-        initialValues={{ email: 'spv@gmail.com', password: 'spv' }}
+        initialValues={{ email: 'admin@gmail.com', password: 'adm' }}
         validationSchema={loginSchema}
-        onSubmit={(values) => handleLogin(values)}
+        onSubmit={(values) => 
+          handleLogin(values)}
       >
         {({
           handleChange,

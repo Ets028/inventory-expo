@@ -15,7 +15,7 @@ export default function TrxLayout() {
                             name="arrow-back"
                             size={24}
                             color="black"
-                            onPress={() => router.push('/transaksiKeluar')}
+                            onPress={() => router.push('/transaksiMasuk')}
                         />
                     ),
                 }}

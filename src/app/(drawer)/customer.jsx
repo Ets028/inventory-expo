@@ -9,19 +9,20 @@ import { Theme } from '@/constants/Theme'
 import ListCustomer from '@/components/customer/ListCustomer'
 import Button from '@/components/Button'
 import { useRouter } from 'expo-router'
+import { useAuth } from '@/context/authContext'
 
 const CustomerScreen = () => {
     const router = useRouter()
-    const { data: customer, isLoading, isError } = useQuery({
+    const { userInfo: { role } } = useAuth()
+    const { data: customer, isLoading, isError, refetch, error } = useQuery({
         queryKey: ['customer'],
         queryFn: getCustomer,
     })
 
     useEffect(() => {
-        if (!customer) {
-            router.push('/home')
-        }
-    }, [customer])
+        refetch()
+    }, [])
+
 
     if (isLoading) {
         return (
@@ -40,6 +41,15 @@ const CustomerScreen = () => {
         )
     }
 
+    if (role === 'petugas') {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <Text style={{ color: 'red',  }}>Anda tidak memiliki akses ke halaman ini</Text>
+                <Button mode='contained' onPress={() => router.push('/home')}>Kembali</Button>
+            </View>
+        )
+    }
+
     return (
         <Layout>
             <View style={{ flex: 1 }}>
@@ -47,6 +57,8 @@ const CustomerScreen = () => {
                     data={customer?.data}
                     renderItem={({ item }) => <ListCustomer item={item} />}
                     keyExtractor={(item) => item.id.toString()}
+                    ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+                    contentContainerStyle={styles.list}
                 />
             </View>
             <FAB style={styles.fab} icon="plus" color={Theme.colors.surface} onPress={() => router.push('/customer/tambah')} />
@@ -64,4 +76,8 @@ const styles = StyleSheet.create({
         bottom: 10,
         backgroundColor: Theme.colors.primary,
     },
+    list: {
+        margin: -10,
+        padding: 5
+    }
 })

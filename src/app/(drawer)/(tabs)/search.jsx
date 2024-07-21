@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import { ActivityIndicator } from 'react-native-paper';
+import { ActivityIndicator, Searchbar } from 'react-native-paper';
 import { getBarang } from '@/hooks/useBarang'; // Pastikan Anda sudah memiliki hook ini
 import Layout from '@/components/Layout';
 import ListItem from '@/components/barang/ListItem'; // Komponen untuk menampilkan item barang
+import { Theme } from '@/constants/Theme';
 
 const SearchScreen = () => {
   const [query, setQuery] = useState('');
@@ -16,8 +17,7 @@ const SearchScreen = () => {
     initialData: { data: [] }, // Set initial data to empty array
   });
 
-  useEffect(() => {
-    console.log('Barang Data:', barangData); // Logging barangData untuk memastikan strukturnya benar
+  useEffect(() => {// Logging barangData untuk memastikan strukturnya benar
   }, [barangData]);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const SearchScreen = () => {
         item.nama_barang.toLowerCase().includes(query.toLowerCase())
         || item.kode_barang.toLowerCase().includes(query.toLowerCase())
       );
-      console.log('Filtered Data:', filtered); // Logging hasil filter
+  // Logging hasil filter
       setFilteredData(filtered);
     } else {
       setFilteredData([]);
@@ -60,8 +60,9 @@ const SearchScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        <TextInput
+        <Searchbar
           style={styles.input}
+          selectionColor={Theme.colors.primary}
           placeholder="Cari barang..."
           value={query}
           onChangeText={handleSearch}
@@ -72,7 +73,7 @@ const SearchScreen = () => {
             renderItem={({ item }) => <ListItem item={item} />}
             keyExtractor={(item) => item.id.toString()}
             ListEmptyComponent={() => (
-              <Text style={styles.emptyMessage}>Item tidak ditemukan</Text>
+              <Text style={styles.emptyMessage}>Barang tidak ditemukan</Text>
             )}
           />
         )}
@@ -90,12 +91,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
     marginBottom: 10,
+    marginTop: -20,
+    borderRadius: 10,
+    backgroundColor: Theme.colors.surface,
+    borderWidth: 1,
+    borderColor: Theme.colors.primary,
   },
   loadingContainer: {
     flex: 1,
@@ -103,9 +104,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyMessage: {
+    justifyContent: 'center',
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 16,
     alignItems: 'center',
   },
 });

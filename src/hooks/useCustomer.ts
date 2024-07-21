@@ -21,7 +21,7 @@ export const getCustomerById = async (id: number) => {
         const response = await axiosInstance.get(`/customer/${id}`);
         return response.data;
     } catch (error) {
-        console.error(error);
+        throw new Error(error.response.data.message)
     }
 }
 
@@ -30,7 +30,7 @@ export const createCustomer = async (data: Tcustomer) => {
         const response = await axiosInstance.post("/customer", data);
         return response.data;
     } catch (error) {
-        console.error(error);
+        throw new Error(error.response.data.message)
     }
 }
 
@@ -39,6 +39,16 @@ export const updateCustomer = async (id: number, data: Tcustomer) => {
         const response = await axiosInstance.patch(`/customer/${id}`, data);
         return response.data;
     } catch (error) {
-        console.error(error);
+        throw new Error(error.response.data.message)
+    }
+}
+
+export const deleteCustomer = async (id: number) => {
+    try {
+        const response = await axiosInstance.delete(`/customer/${id}`);
+        return response.data;
+    } catch (error) {
+        console.log(error)
+        throw new Error(error.response.data.message)
     }
 }

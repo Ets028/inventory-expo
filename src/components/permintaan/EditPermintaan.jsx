@@ -182,7 +182,7 @@ export default function EditPermintaan() {
               editable={false}
             />
             <Button mode="contained" onPress={handleSubmit}>
-              {isLoading ? "Loading..." : "Update"}
+              {isLoading ? <ActivityIndicator size="small" color="white" /> : "Update"}
             </Button>
           </View>
         )}

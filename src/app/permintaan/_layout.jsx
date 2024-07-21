@@ -14,7 +14,7 @@ export default function PermintaanLayout() {
               name="arrow-back"
               size={24}
               color="black"
-              onPress={() => router.back()}
+              onPress={() => router.push('/permintaan')}
             />
           ),
         }}
